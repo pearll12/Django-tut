@@ -247,7 +247,7 @@ INSTALLED_APPS = [
 - go in urls.py of the main project, paste the path, and keep it at the end, it is the path that actually enables auto reloading - coz this is heavy
 <h1> YOU ALSO REMOVE THE HOT-RELOADING PART BEFORE PRODUCTION COZ U DONT NEED IT THERE </H1>
 ```python
- path('__reload__/', include("django_browser_reload.urls")),
+path('__reload__/', include("django_browser_reload.urls")),
 ```
 - after this restart both the terminals
 
