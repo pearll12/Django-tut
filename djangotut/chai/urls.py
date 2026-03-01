@@ -5,4 +5,5 @@ from . import views #current directory import views
 # localhost:8000/chai
 urlpatterns = [
     path('', views.all_models, name="all-models"), #don't write / in home in python and django
+    path('<int:chai_id>/', views.chai_description, name="chai_detail")
 ]
