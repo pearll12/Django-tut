@@ -445,7 +445,7 @@ def chai_description(request, chai_id): #pass chai_id to the urls as well
 # 10. Django Relationship models
 Here’s a clean, short version you can put in your documentation:
 
-## Default User Model in Django
+## 10.1 Default User Model in Django
 - Django provides a built-in **User model** through `django.contrib.auth`.
 When you run `python manage.py migrate`, Django automatically creates the user table in the database.
 It includes fields like:
@@ -464,3 +464,95 @@ This built-in authentication system allows you to handle login, logout, permissi
 
 `from django.contrib.auth.models import User`
 
+## 10.2 One to many relationship
+```python
+from django.core.validators import MinValueValidator, MaxValueValidator
+# Relationships - One to Many
+class chaiReview(models.Model):
+    chai = models.ForeignKey(ChaiVariety, on_delete=models.CASCADE, related_name="review")
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)]) #from django.core.validators import MinValueValidator, MaxValueValidator
+    comment = models.TextField(max_length=200)
+    date_added = models.DateField(default = timezone.now)
+
+    def __str__(self): #dunder string function
+        return f'{self.username} review for {self.chai.name}'
+```
+- `models.CASCADE` is used with ForeignKey or OneToOneField to define what happens when the related (parent) object is deleted. If the parent object is deleted, all related child objects are automatically deleted as well.
+- Foreign key automatically makes django understand that the relationship is one to many
+
+## 10.3 Many to many relationship
+```python
+# Many to Many
+class Store(models.Model):
+    name =  models.CharField(max_length=100)
+    location = models.CharField(max_length=100)
+    chai_varieties = models.ManyToManyField(ChaiVariety, related_name="stores")
+
+    def __str__(self):
+        return self.name
+```
+- related name is basically doosri table mein m kis naam se jana jaau
+- it is advised to keep the `related_name` as the name of the model only
+
+## 10.4 One to one relationship
+```python
+from django.db import models
+from django.utils import timezone
+from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator, MaxValueValidator
+from datetime import timedelta
+
+# One to One
+def defaultuntil():
+    return timezone.now() + timedelta(days=600)
+
+class ChaiCertificate(models.Model):
+    chai = models.OneToOneField(ChaiVariety, related_name="certificate", on_delete=models.CASCADE)
+    issued_date = models.DateTimeField(default=timezone.now)
+    valid_until = models.DateTimeField(default=defaultuntil) 
+    certificate_number = models.CharField(max_length=10, validators=[MinValueValidator(10), MaxValueValidator(10)])
+
+    def __str__(self):
+        return f'Certificate for {self.chai.name}'
+```
+
+## 10.5 Admin changes
+- before making changes in admin.py, you should first do the migrations to let the django know that these r the new models
+- then u can register the models in admin.py
+```python
+python manage.py makemigrations chai
+python manage.py migrate
+```
+- Making changes in admin.py:
+```python
+from django.contrib import admin
+from .models import ChaiVariety, ChaiCertificate, chaiReview, Store
+
+# Register your models here.
+
+# tabular inline se wo doosre model k saath hi dikhta h alag se model nahi dikhta
+# extra = 2 mtlb iske field kitni baar dikhenge
+class ChaiReviewInline(admin.TabularInline):
+    model = chaiReview
+    extra=2
+
+# admin.ModelAdmin is most popular, list_display m jo bhi daal rahe ho these are model ki fields 
+# inlines mtlb iski inline m doosra wala class hoga
+class ChaiVarietyAdmin(admin.ModelAdmin):
+    list_display = ('name', 'type', 'price', 'date_added')
+    inlines = (ChaiReviewInline,)
+
+# Many to many m useful filter_horizontal
+class StoreAdmin(admin.ModelAdmin):
+    list_display = ('name', 'location')
+    filter_horizontal = ('chai_varieties',)
+
+class ChaiCertificateAdmin(admin.ModelAdmin):
+    list_display = ('chai', 'certificate_number', 'issued_date')
+    
+admin.site.register(ChaiVariety, ChaiVarietyAdmin)
+admin.site.register(ChaiCertificate, ChaiCertificateAdmin)
+admin.site.register(Store, StoreAdmin)
+```
+![alt text](screenshots/image5.png)

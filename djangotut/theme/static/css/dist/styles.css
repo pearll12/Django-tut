@@ -232,6 +232,9 @@
   .grid {
     display: grid;
   }
+  .inline {
+    display: inline;
+  }
   .table {
     display: table;
   }
