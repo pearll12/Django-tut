@@ -14,6 +14,7 @@ class ChaiReviewInline(admin.TabularInline):
 class ChaiVarietyAdmin(admin.ModelAdmin):
     list_display = ('name', 'type', 'price', 'date_added')
     inlines = (ChaiReviewInline,)
+# you can add these in form on tuples or list only (check for each) and (,) atleast that one comma is necessary 
 
 # Many to many m useful filter_horizontal
 class StoreAdmin(admin.ModelAdmin):
