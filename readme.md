@@ -272,6 +272,8 @@ python manage.py createsuperuser
 - email address - can leave empty and can be made compulsory from the db
 - now when u run server and go to "admin/" path, you will be able to see the admin panel. 
 
+---
+
 # 9. Models
 - whenever you want to make anything related to the database i.e. the models , you don't make it in the main-project during production.
 - You make models in your app folder -> models.py
@@ -439,3 +441,26 @@ def chai_description(request, chai_id): #pass chai_id to the urls as well
     # it will look in the template and look for chai/chai_detail.html , also pass an object 
     return render(request, 'chai/chai_detail.html', {'chai': chai} )
 ```
+---
+# 10. Django Relationship models
+Here’s a clean, short version you can put in your documentation:
+
+## Default User Model in Django
+- Django provides a built-in **User model** through `django.contrib.auth`.
+When you run `python manage.py migrate`, Django automatically creates the user table in the database.
+It includes fields like:
+* `username`
+* `email`
+* `password` (stored securely as a hash)
+* `is_staff`
+* `is_superuser`
+* `is_active`
+* `date_joined`
+You can create users using:
+```
+python manage.py createsuperuser
+```
+This built-in authentication system allows you to handle login, logout, permissions, and admin access without creating a custom user model.
+
+`from django.contrib.auth.models import User`
+

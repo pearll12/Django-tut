@@ -5,10 +5,15 @@
 {% block content %}
 <h1>All CHai - Description page</h1>
 
-<h1> {{chai.name}} </h1>
-<p>{{chai.description}}</p>
-<div class="text-center m-auto">
-    <img class="text-center m-auto h-20" src="{{chai.image.url}}" alt="img">
+<div class="text-center bg-amber-950 flex flex-col m-10">
+    <div>
+        <h1 class="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-blue-500"> {{chai.name}} </h1>
+    </div>
+    <p>{{chai.description}}</p>
+    <div class="text-center m-auto">
+        <img class="h-40" src="{{chai.image.url}}" alt="img">
+    </div>
+    
 </div>
 
 
