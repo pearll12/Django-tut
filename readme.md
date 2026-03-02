@@ -518,6 +518,7 @@ class ChaiCertificate(models.Model):
 ```
 
 ## 10.5 Admin changes
+- INLINE ADMIN PANEL INJECTIONS
 - before making changes in admin.py, you should first do the migrations to let the django know that these r the new models
 - then u can register the models in admin.py
 ```python
@@ -557,3 +558,124 @@ admin.site.register(ChaiCertificate, ChaiCertificateAdmin)
 admin.site.register(Store, StoreAdmin)
 ```
 ![alt text](screenshots/image5.png)
+
+# 11. Forms in Django
+- you can make forms on method or class basis
+- every form is connected on the basis to a model. if u just want to take data from user and save it then u have many option like CharField etc
+- but if u already have a well furnished model and want to display the data in the existing form then u can auto-link
+- in `forms.py`
+```python
+from django import forms 
+from .models import ChaiVariety
+
+class ChaiVarietyForm(forms.Form):
+    # one of the way is modelchoice field that queries in your existing form - and gets the choices which have dropdown 
+    # if we had given character field -> box deta where we had input chars
+    chai_variety = forms.ModelChoiceField(queryset=ChaiVariety.objects.all, label ="chai_variety")
+```
+
+## 11.1 Form submit case
+- go in `views.py`
+- 2 cases always consider
+```python
+def chai_stores(request):
+    stores=None
+    # once user has submitted the form
+    if request.method == 'POST':
+        form = ChaiVarietyForm(request.POST)
+        if form.is_valid():
+            chai_variety = form.cleaned_data['chai_variety'] # to check if 
+            stores = Store.objects.filter(chai_varieties = chai_variety) # searches for chai_variety in chai varities
+    else:
+        form = ChaiVarietyForm()
+        # basic form ChaiVariety m jo bhi form hai as it is pass on krdo
+    return render(request, "chai/chai_stores.html", {'stores': stores , 'form': form})
+```
+
+1. **Create a Form Class**
+- Define a form in `forms.py` (e.g., `ChaiVarietyForm`).
+This defines the fields and validation rules.
+
+2. **Display the Form (GET Request)**
+
+When the page loads normally:
+```python
+form = ChaiVarietyForm()
+```
+An empty form is created and sent to the template.
+
+
+3. **Handle Form Submission (POST Request)**
+
+When the user submits the form:
+
+```python
+if request.method == 'POST':
+    form = ChaiVarietyForm(request.POST)
+```
+
+* `request.POST` contains submitted form data.
+* The form instance is created with user input.
+
+
+4. **Validate the Form**
+
+```python
+if form.is_valid():
+```
+
+* Django checks field types, required fields, and custom validation.
+* If valid, cleaned and safe data is available via:
+
+```python
+form.cleaned_data
+```
+
+5. **Access Cleaned Data**
+
+```python
+chai_variety = form.cleaned_data['chai_variety']
+```
+
+`cleaned_data` contains validated Python data (not raw strings).
+
+6. **Use the Data**
+
+Example:
+
+```python
+stores = Store.objects.filter(chai_varieties=chai_variety)
+```
+The form input is used to query the database.
+
+7. **Render Response**
+
+Finally, render the template with the form and results:
+
+```python
+return render(request, "chai/chai_stores.html", {
+    'stores': stores,
+    'form': form
+})
+```
+### Summary Flow
+- GET → Show empty form
+- POST → Bind data → Validate → Access cleaned_data → Perform logic → Render result
+
+```python
+<form method="POST">
+    {% csrf_token %} 
+    {% comment %} by default django proves every form csrf attack proof so we cannot hit any vulnerability{% endcomment %}
+    {{form.as_p}}
+    <button type="submit">Get store</button>
+</form>
+
+{% if stores %}
+    Stores available
+    {% for store in stores %}
+        <li> {{store.name}} - {{store.location}} </li>
+    {% endfor %}
+{% endif %}
+```
+- this is how u render forms in the template
+- `form.as_p` renders it in paragraph format which is considered better

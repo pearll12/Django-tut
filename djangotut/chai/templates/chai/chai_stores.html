@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block content %}
+test form
+
+<form method="POST">
+    {% csrf_token %} 
+    {% comment %} by default django proves every form csrf attack proof so we cannot hit any vulnerability{% endcomment %}
+    {{form.as_p}}
+    <button type="submit">Get store</button>
+</form>
+
+{% if stores %}
+    Stores available
+    {% for store in stores %}
+        <li> {{store.name}} - {{store.location}} </li>
+    {% endfor %}
+{% endif %}
+{% endblock %}
